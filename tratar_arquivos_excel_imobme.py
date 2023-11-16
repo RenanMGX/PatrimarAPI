@@ -5,6 +5,8 @@ import json
 import os
 import pygetwindow as gw
 from datetime import datetime
+from shutil import copy2
+import numpy as np
 
 class ImobmeExceltoJson():
     def __init__(self):
@@ -43,26 +45,37 @@ class ImobmeExceltoJson():
                 
 
                 df = pd.read_excel(arquivo_temp)
-                df.replace([float('inf'), float('-inf')], float('nan'), inplace=True)
-                df = df.dropna()
-                #arquivo_final = df.to_json()
-                colunas = df.columns.tolist()
-                arquivo_final = {}
-                for coluna in colunas:
-                    arquivo_final[coluna] = df[coluna].tolist()
+                #df.replace([float('inf'), float('-inf')], float('nan'), inplace=True)
+                #df = df.dropna()
+                #df.fillna("", inplace=True)
+                df = df.replace(float('nan'), "")
+
+                #arquivo_final = df.to_dict(orient='records')
+                arquivo_final = df.to_json(orient='records')
+
+                #colunas = df.columns.tolist()
+                #arquivo_final = {}
+                #for coluna in colunas:
+                #    arquivo_final[coluna] = df[coluna].tolist()
 
                 os.unlink(arquivo_temp)
-
+                
+                os.unlink(f"dados\\{nome_arquivo}")
+                nome_arquivo = nome_arquivo.split(".")[0]
                 self.__dicionatio_final[nome_arquivo] = arquivo_final
+                with open(f'dados\\{nome_arquivo}.json', 'w')as arqui:
+                    arqui.write(arquivo_final)
 
 
-        
-        return self.__dicionatio_final
+        #for key,value in self.__dicionatio_final.items():
+        #    return value
 
 if __name__ == "__main__":
+    
     tratar = ImobmeExceltoJson()
-    arquivos = tratar.tratar_arquivos(['C:\\Projetos\\PatrimarAPI\\downloads\\ContratosRescindidos_22069_20231115-191427.xlsx'])
-    arquivos = arquivos['ContratosRescindidos']['Código SPE']
+
+    arquivos = tratar.tratar_arquivos(['C:\\Projetos\\PatrimarAPI\\dados\\ContratosRescindidos.xlsx'])
+    #arquivos = arquivos['ContratosRescindidos']['Código SPE']
     #print(arquivos)
     
     

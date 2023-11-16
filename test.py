@@ -1,10 +1,7 @@
-import os
-from tkinter import filedialog as fd
-exten_excel = ['xlsx','xlsm','xlsb', 'xltx']
+import json
 
-string = "C:\\Projetos\\PatrimarAPI\\downloads\\ContratosRescindidos_22069_20231115-191427.xlsx"
-lista = ['C:\\Projetos\\PatrimarAPI\\downloads\\ContratosRescindidos_22069_20231115-191427.xlsx']
+arquivo = ""
+with open('test123.json', 'r', encoding='utf-8')as arqui:
+    arquivo = json.load(arqui)
 
-temp = ['a','d','a','4']
-temp.pop(-1)
-print(''.join(temp))
+print(arquivo)

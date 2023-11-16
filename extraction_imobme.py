@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from time import sleep
 from datetime import datetime
+from shutil import copy2
 
 
 
@@ -56,7 +57,7 @@ class BotExtractionImobme():
         relatorios registrador no script são:
             imobme_empreendimento
             imobme_controle_vendas
-            imobme_contrator_rescindidos
+            imobme_contratos_rescindidos
         '''
         if isinstance(relatorios, list):
             if len(relatorios) == 0:
@@ -93,7 +94,7 @@ class BotExtractionImobme():
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="GerarRelatorio"]'}}) # clica em gerar relatorio
 
                 # para gerar o relatorio contrator rescindidos
-                elif relatorio.lower() == "imobme_contrator_rescindidos":
+                elif relatorio.lower() == "imobme_contratos_rescindidos":
                     verificar_se_tem_relatorios += 1
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn"]/a'}}) # clique em selecionar Relatorios
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_8"]'}}) # clique em IMOBME - Contratos Rescindicos
@@ -207,19 +208,29 @@ class BotExtractionImobme():
             sleep(10)
             #input("############## esperando:   ")
             #self.converter_para_csv()
+
+            caminho_dados = "dados"
+            if not os.path.exists(caminho_dados):
+                os.makedirs(caminho_dados)
             caminho_dos_arquivos = []
-            for arquivos in os.listdir(self.caminho_download):
-                caminho_dos_arquivos.append(f"{self.caminho_download}{arquivos}")
+            for arquivoss in os.listdir(self.caminho_download):
+                arquivo_nome = arquivoss.split('\\')[-1:][0]
+                novo_nome = f"{arquivo_nome.split('_')[0]}.xlsx"
+                copy2(f"{self.caminho_download}{arquivoss}", f"{caminho_dados}\\{novo_nome}")
+
+                caminho_dos_arquivos.append(f"{caminho_dados}\\{novo_nome}")
+
+                
             return caminho_dos_arquivos
         
     def roteiro(self, roteiro, emergency_break=60*60):
         contador = 0
         while contador <= emergency_break:
             for evento in roteiro:
-                print(evento['kargs'])
+                #print(evento['kargs'])
                 eventos = evento['action'](evento['kargs'])
                 if eventos == "saida":
-                    print("saindo")
+                    #print("saindo")
                     return
                 elif eventos == "emergencia":
                     print("saida de Emergencia")
@@ -240,10 +251,10 @@ class BotExtractionImobme():
     def debug_click(self, argumentos):
         try:
             target = self.navegador.find_element(By.XPATH, argumentos['target'])
-            print(target)
+            #print(target)
             return "saida"
         except:
-            print(f"{argumentos['target']} não encontrado")
+            #print(f"{argumentos['target']} não encontrado")
             return "saida"
 
     def escrever(self, argumentos):
@@ -288,7 +299,14 @@ class BotExtractionImobme():
             pass
 
 if __name__ == "__main__":
-    tempo_inicio = datetime.datetime.now()
-    robo = BotExtractionImobme()
-    robo.iniciar_navegador()
-    print(datetime.datetime.now() - tempo_inicio)
+    import credenciais as cd
+    from tratar_arquivos_excel_imobme import ImobmeExceltoJson
+
+    bot = BotExtractionImobme(usuario=cd.usuario,senha=cd.senha)
+    tratar = ImobmeExceltoJson()   
+    arquivos = bot.obter_relatorios(["imobme_contratos_rescindidos","imobme_controle_vendas","imobme_empreendimento"])
+    tratar.tratar_arquivos(arquivos)
+
+
+    #robo = BotExtractionImobme()
+    #robo.iniciar_navegador()
