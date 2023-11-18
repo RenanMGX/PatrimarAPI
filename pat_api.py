@@ -6,20 +6,11 @@ import credenciais
 import json
 from typing import Dict, List
 
-
 caminho_dados = "dados\\"
-
-
-
-
-
-
 #arquivos = bot.iniciar_navegador(debug=True)
-
 #arquivos = bot.obter_relatorios(["imobme_contratos_rescindidos"])
 #arquivos = tratar.tratar_arquivos(['C:\\Projetos\\PatrimarAPI\\downloads\\Empreendimentos_22078_20231116-095153.xlsx','C:\\Projetos\\PatrimarAPI\\downloads\\ContratosRescindidos_22077_20231116-095153.xlsx','C:\\Projetos\\PatrimarAPI\\downloads\\Vendas_22079_20231116-095155.xlsx'])
 #print(arquivos)
-
 
 def validar_key(key):
     valid_key = ["sdf49as8ef1489da14fa9s8g4"]
@@ -27,9 +18,6 @@ def validar_key(key):
         return True
     return False
 
-test = [{"coluna1": "valor1","coluna2": "valor2","coluna3": "valor3","coluna4": "valor4","coluna5": "valor5"},
-        {"coluna1": "valor1","coluna2": "valor2","coluna3": "valor3","coluna4": "valor4","coluna5": "valor5"},
-        {"coluna1": "valor1","coluna2": "valor2","coluna3": "valor3","coluna4": "valor4","coluna5": "valor5"}]
 
 app = FastAPI(
     title="PatrimarAPI",
@@ -57,15 +45,9 @@ async def contratos_rescindidos(relatorio, x_key: str = Header(default=None)):
             return json.load(arqui)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Arquivo não encontrado!")
-    
-
-
-
 
 if __name__ == "__main__":
     #arquivos = bot.obter_relatorios(["imobme_controle_vendas","imobme_contratos_rescindidos", "imobme_empreendimento"])
     import uvicorn
-
     
-
     uvicorn.run("pat_api:app", host="0.0.0.0" , port=7000, reload=True)
