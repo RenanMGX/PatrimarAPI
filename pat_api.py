@@ -1,24 +1,12 @@
 import os
 from fastapi import FastAPI, HTTPException, status, Header, Depends
-from extraction_imobme import BotExtractionImobme
-from tratar_arquivos_excel_imobme import ImobmeExceltoJson
-import credenciais
 import json
-from typing import Dict, List
-
+import pandas
+from extraction_imobme import BotExtractionImobme
+import credenciais as cd
+from tratar_arquivos_excel_imobme import ImobmeExceltoJson
 
 caminho_dados = "dados\\"
-
-
-
-
-
-
-#arquivos = bot.iniciar_navegador(debug=True)
-
-#arquivos = bot.obter_relatorios(["imobme_contratos_rescindidos"])
-#arquivos = tratar.tratar_arquivos(['C:\\Projetos\\PatrimarAPI\\downloads\\Empreendimentos_22078_20231116-095153.xlsx','C:\\Projetos\\PatrimarAPI\\downloads\\ContratosRescindidos_22077_20231116-095153.xlsx','C:\\Projetos\\PatrimarAPI\\downloads\\Vendas_22079_20231116-095155.xlsx'])
-#print(arquivos)
 
 
 def validar_key(key):
@@ -27,9 +15,13 @@ def validar_key(key):
         return True
     return False
 
-test = [{"coluna1": "valor1","coluna2": "valor2","coluna3": "valor3","coluna4": "valor4","coluna5": "valor5"},
-        {"coluna1": "valor1","coluna2": "valor2","coluna3": "valor3","coluna4": "valor4","coluna5": "valor5"},
-        {"coluna1": "valor1","coluna2": "valor2","coluna3": "valor3","coluna4": "valor4","coluna5": "valor5"}]
+def gerar_novos_arquivos(relatorios):
+    imobme = BotExtractionImobme(usuario=cd.usuario,senha=cd.senha)
+    print(relatorios)
+    relat = imobme.obter_relatorios([relatorios])
+    tratar = ImobmeExceltoJson()  
+    tratar.tratar_arquivos(relat)
+
 
 app = FastAPI(
     title="PatrimarAPI",
@@ -42,30 +34,69 @@ app = FastAPI(
 #  Vendas
 @app.get('/relatorios_imobme/{relatorio}',
          description="este EndPoint ira retornar um arquivo json do relatorio solicitado os relatorios cadastrados são: 'ContratosRescindidos', 'Empreendimentos', 'Vendas  ",
-         response_description=test
+         
          )
-async def contratos_rescindidos(relatorio, x_key: str = Header(default=None)):
+async def contratos_rescindidos(relatorio, colunas=None, x_key: str = Header(default=None), x_novo: bool = Header(default=False)):
     #if not validar_key(x_key):
     #    return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Chave Invalida!")
     
+    if x_novo:
+        gerar_novos_arquivos(relatorio)
+    
+    
+    if colunas != None:
+        colunas = colunas.split(";")
+
     dados = []
     for arquivo in os.listdir(caminho_dados):
         if relatorio in arquivo:
             dados.append(f"{caminho_dados}{arquivo}")
     if len(dados) > 0:
         with open(dados[0], 'r', encoding='utf-8')as arqui:
-            return json.load(arqui)
+            dados_retorno = json.load(arqui)
+        
+        if colunas != None:
+            if len(colunas) > 0:
+                dataframe_colunas = []
+                df = pandas.DataFrame(dados_retorno)
+                for coluna in colunas:
+                    try:
+                        dataframe_colunas.append(df[[coluna]])
+                    except:
+                        continue
+                df = pandas.DataFrame()
+                for dataframe in dataframe_colunas:
+                    df = pandas.concat([df, dataframe], axis=1)
+                
+                if bool(df.to_dict()):
+                    return df.to_dict(orient='records')
+                else:
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Nenhuma Coluna Encontrada!")
+            else:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo de Colunas Vazio")
+        else:
+            return dados_retorno
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Arquivo não encontrado!")
     
-
-
+def config():
+    default_config = {
+        "host" : "0.0.0.0",
+        "port" : 8000,
+        #"reload" : False
+    }
+    try:
+        with open("config_api.json", 'r')as arqui:
+            return json.load(arqui)
+    except:
+        with open("config_api.json", 'w')as arqui:
+            json.dump(default_config, arqui)
+            return default_config
 
 
 if __name__ == "__main__":
-    #arquivos = bot.obter_relatorios(["imobme_controle_vendas","imobme_contratos_rescindidos", "imobme_empreendimento"])
     import uvicorn
-
     
-
-    uvicorn.run("pat_api:app", host="0.0.0.0" , port=7000, reload=True)
+    termos = config()
+    #uvicorn.run(app=app, host=termos['host'] , port=termos['port'], reload=True)
+    uvicorn.run("pat_api:app", host=termos['host'] , port=termos['port'], reload=True)

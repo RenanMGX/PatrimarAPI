@@ -60,6 +60,8 @@ class BotExtractionImobme():
             imobme_contratos_rescindidos
         '''
         if isinstance(relatorios, list):
+            print("###")
+            print(relatorios)
             if len(relatorios) == 0:
                 print("A lista de 'relatorios' não pode está vazia")
                 return False
@@ -70,7 +72,7 @@ class BotExtractionImobme():
                 relatorio = str(relatorio)
 
                 # para gerar o relatorios de empreendimento
-                if relatorio.lower() == "imobme_empreendimento":
+                if (relatorio.lower() == "imobme_empreendimento") or (relatorio.lower() == "empreendimentos"):
                     verificar_se_tem_relatorios += 1
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn"]/a'}}) # clique em selecionar Relatorios
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_13"]'}}) # clique em IMOBME - Empreendimento
@@ -80,7 +82,7 @@ class BotExtractionImobme():
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="GerarRelatorio"]'}}) # clica em gerar relatorio
                 
                 # para gerar o relatorio contole de vendas
-                elif relatorio.lower() == "imobme_controle_vendas":
+                elif (relatorio.lower() == "imobme_controle_vendas") or (relatorio.lower() == "vendas"):
                     verificar_se_tem_relatorios += 1
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn"]/a'}}) # clique em selecionar Relatorios
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_11"]'}}) # clique em IMOBME - Contre de Vendas
@@ -94,7 +96,7 @@ class BotExtractionImobme():
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="GerarRelatorio"]'}}) # clica em gerar relatorio
 
                 # para gerar o relatorio contrator rescindidos
-                elif relatorio.lower() == "imobme_contratos_rescindidos":
+                elif (relatorio.lower() == "imobme_contratos_rescindidos") or (relatorio.lower() == "contratosrescindidos"):
                     verificar_se_tem_relatorios += 1
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn"]/a'}}) # clique em selecionar Relatorios
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_8"]'}}) # clique em IMOBME - Contratos Rescindicos

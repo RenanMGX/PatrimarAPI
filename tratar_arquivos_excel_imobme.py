@@ -1,12 +1,12 @@
 import pandas as pd
-from tkinter import filedialog as fd
+#from tkinter import filedialog as fd
 import xlwings as xw
-import json
+#import json
 import os
-import pygetwindow as gw
+#import pygetwindow as gw
 from datetime import datetime
 from shutil import copy2
-import numpy as np
+#import numpy as np
 
 class ImobmeExceltoJson():
     def __init__(self):
@@ -24,8 +24,10 @@ class ImobmeExceltoJson():
                 continue
 
             if arquivo_exten in self.__exten_excel:
+                print(arquivo)
                 app = xw.App(visible=False)
                 wb = app.books.open(arquivo)
+                
                 #wb = xw.Book(arquivo)
                 if len(wb.sheets) > 1:
                     wb.sheets[0].delete()
@@ -74,7 +76,18 @@ if __name__ == "__main__":
     
     tratar = ImobmeExceltoJson()
 
-    arquivos = tratar.tratar_arquivos(['C:\\Projetos\\PatrimarAPI\\dados\\ContratosRescindidos.xlsx'])
+    lista_arquivos = os.listdir("dados")
+    cont = 0
+    for arquiv in lista_arquivos:
+        arquiv_tratado = f"{arquiv.split('_')[0].split('.')[0]}.xlsx"
+        os.rename(f"dados\\{arquiv}", f"dados\\{arquiv_tratado}")
+
+        lista_arquivos[cont] = f"dados\\{arquiv_tratado}"
+        cont += 1
+
+        
+
+    arquivos = tratar.tratar_arquivos(lista_arquivos)
     #arquivos = arquivos['ContratosRescindidos']['Código SPE']
     #print(arquivos)
     
