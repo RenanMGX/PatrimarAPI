@@ -24,8 +24,8 @@ class BotExtractionImobme():
             {'action' : self.finalizar, 'kargs' : {'target' : '//*[@id="login"]', 'exist' : False}} # se não achar o campo do login ele finaliza o roteiro
         ]
         self.ir_relatorios = [
-            {'action' : self.clicar, 'kargs' : {'target' : '/html/body/div[1]/nav/ul/li[4]'}}, # clicar no icone dos relatorios
-            {'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Menu"]/ul/li[4]/div/ul/li/a'}}, # clica no botão gerar relatorios
+            {'action' : self.clicar, 'kargs' : {'target' : '/html/body/div/nav/ul/li[1]/a'}}, # clicar no icone dos relatorios
+            {'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Menu"]/ul/li[1]/div/ul/li/a'}}, # clica no botão gerar relatorios
             {'action' : self.finalizar, 'kargs' : {'target' : '//*[@id="result-table"]/tbody', 'exist' : True}} # finaliza o roteiro se achar a lista dos relatorios
         ]
         self.verificar_lista = [
@@ -85,7 +85,7 @@ class BotExtractionImobme():
                 elif (relatorio.lower() == "imobme_controle_vendas") or (relatorio.lower() == "vendas"):
                     verificar_se_tem_relatorios += 1
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn"]/a'}}) # clique em selecionar Relatorios
-                    self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_11"]'}}) # clique em IMOBME - Contre de Vendas
+                    self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_1"]'}}) # clique em IMOBME - Contre de Vendas
                     self.gerar_relatorios.append({'action' : self.esperar, 'kargs' : {'segundos' : 2}})  # colocar uma espera
                     self.gerar_relatorios.append({'action' : self.escrever, 'kargs' : {'target' : '//*[@id="DataInicio"]', 'input' : "01012015"}})  # escreve a data de inicio padrao 01/01/2015
                     self.gerar_relatorios.append({'action' : self.escrever, 'kargs' : {'target' : '//*[@id="DataFim"]', 'input' : datetime.now().strftime("%d%m%Y")}})  # escreve a data hoje
@@ -99,7 +99,7 @@ class BotExtractionImobme():
                 elif (relatorio.lower() == "imobme_contratos_rescindidos") or (relatorio.lower() == "contratosrescindidos"):
                     verificar_se_tem_relatorios += 1
                     self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn"]/a'}}) # clique em selecionar Relatorios
-                    self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_8"]'}}) # clique em IMOBME - Contratos Rescindicos
+                    self.gerar_relatorios.append({'action' : self.clicar, 'kargs' : {'target' : '//*[@id="Relatorios_chzn_o_2"]'}}) # clique em IMOBME - Contratos Rescindicos
                     self.gerar_relatorios.append({'action' : self.esperar, 'kargs' : {'segundos' : 2}})  # colocar uma espera
                     self.gerar_relatorios.append({'action' : self.escrever, 'kargs' : {'target' : '//*[@id="DataInicio"]', 'input' : "01012015"}})  # escreve a data de inicio padrao 01/01/2015
                     self.gerar_relatorios.append({'action' : self.escrever, 'kargs' : {'target' : '//*[@id="DataFim"]', 'input' : datetime.now().strftime("%d%m%Y")}})  # escreve a data hoje
@@ -131,21 +131,6 @@ class BotExtractionImobme():
 
         #self.iniciar_navegador()
 
-    def converter_para_csv(self):
-        arquivos = os.listdir(self.caminho_download)
-        for arquivo in arquivos:
-            arquivo = self.caminho_download + arquivo
-            wb = xw.Book(arquivo)
-            if len(wb.sheets) > 1:
-                wb.sheets[0].delete()
-            #os.unlink(arquivo)
-            print(arquivo)
-            wb.save(arquivo)
-            wb.close()
-            #return
-            df = pd.read_excel(arquivo)
-            df.to_csv(arquivo.replace(".xlsx", ".csv") , sep=';', index=False)
-            os.unlink(arquivo)
 
     def iniciar_navegador(self,debug=False):
         if not os.path.exists(self.caminho_download):
@@ -183,10 +168,10 @@ class BotExtractionImobme():
             #deletar dados se ouver
             for indice,linha in enumerate(lista_para_apagar):
                 self.roteiro([
-                              {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[11]/a'}},
-                              {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[11]/a'}},
-                              {'action' : self.clicar, 'kargs' : {'target' : f'/html/body/div[3]/div[3]/div/button[1]'}},
-                              {'action' : self.finalizar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[11]/a', 'exist' : False}}, 
+                              {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[12]/a'}},
+                              {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[12]/a'}},
+                              {'action' : self.clicar, 'kargs' : {'target' : f'/html/body/div[5]/div[3]/div/button[1]'}},
+                              {'action' : self.finalizar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[12]/a', 'exist' : False}}, 
                                 ])
             
             #gerar relatorio
@@ -201,8 +186,8 @@ class BotExtractionImobme():
                 self.roteiro([
                               {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="btnProximaDefinicao"]'}},
                               {'action' : self.esperar, 'kargs' : {'segundos' : 1}},
-                              {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[10]/a'}},
-                              {'action' : self.finalizar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[10]/a', 'exist' : True}}, 
+                              {'action' : self.clicar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[11]/a'}},
+                              {'action' : self.finalizar, 'kargs' : {'target' : f'//*[@id="result-table"]/tbody/tr[{indice + 1}]/td[11]/a', 'exist' : True}}, 
                               {'action' : self.esperar, 'kargs' : {'segundos' : 6}}
                                 ])
             
@@ -306,7 +291,8 @@ if __name__ == "__main__":
 
     bot = BotExtractionImobme(usuario=cd.usuario,senha=cd.senha)
     tratar = ImobmeExceltoJson()   
-    arquivos = bot.obter_relatorios(["imobme_contratos_rescindidos","imobme_controle_vendas","imobme_empreendimento"])
+    #arquivos = bot.obter_relatorios(["imobme_contratos_rescindidos","imobme_controle_vendas","imobme_empreendimento"])
+    arquivos = bot.obter_relatorios(["imobme_controle_vendas", "imobme_contratos_rescindidos"])
     tratar.tratar_arquivos(arquivos)
 
 

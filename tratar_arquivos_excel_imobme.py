@@ -50,7 +50,7 @@ class ImobmeExceltoJson():
                 #df.replace([float('inf'), float('-inf')], float('nan'), inplace=True)
                 #df = df.dropna()
                 #df.fillna("", inplace=True)
-                df = df.replace(float('nan'), "")
+                df = df.replace(float('nan'), None)
 
                 #arquivo_final = df.to_dict(orient='records')
                 arquivo_final = df.to_json(orient='records')
@@ -67,6 +67,8 @@ class ImobmeExceltoJson():
                 self.__dicionatio_final[nome_arquivo] = arquivo_final
                 with open(f'dados\\{nome_arquivo}.json', 'w')as arqui:
                     arqui.write(arquivo_final)
+                
+                copy2(f'dados\\{nome_arquivo}.json', f'C:\\Users\\renan\\OneLake - Microsoft\\DW_BI\\lake_house.Lakehouse\\Files\\jsons\\VendasContratos\\{nome_arquivo}.json')
 
 
         #for key,value in self.__dicionatio_final.items():

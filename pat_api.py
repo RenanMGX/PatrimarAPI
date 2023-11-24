@@ -65,8 +65,12 @@ app = FastAPI(
          description="este EndPoint ira retornar um arquivo json do relatorio solicitado os relatorios cadastrados são: 'ContratosRescindidos', 'Empreendimentos', 'Vendas  ",
          )
 async def contratos_rescindidos(relatorio, colunas=None, x_key: str = Header(default=None), x_novo: bool = Header(default=False), request: Request = None):
-    endereco_ip = request.client.host
-    hostname = socket.gethostbyaddr(endereco_ip)
+    try:
+        endereco_ip = request.client.host
+        hostname = socket.gethostbyaddr(endereco_ip)
+    except:
+        hostname = "não encontrado"
+    print(hostname)
     # recebe a key fornecida pelo usuario da API e valida se é verdadeira
     hash_valid = validar_key(x_key)
     if hash_valid == False:
@@ -109,6 +113,7 @@ async def contratos_rescindidos(relatorio, colunas=None, x_key: str = Header(def
                 #caso as colunas informadas existirem no arquivo ele irá retornar para o usuario
                 if bool(df.to_dict()):
                     registro(key=hash_valid,end_point=relatorio,status="OK!")
+                    df = df.replace(float('nan'), None)
                     return df.to_dict(orient='records')
                 else:
                     registro(key=hash_valid,end_point=relatorio,status="Nenhuma Coluna Encontrada!")
